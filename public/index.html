@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MemeZone - Random Meme Feed</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        nav {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            color: white;
+            font-size: 2rem;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        .btn.active {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            transition: border 0.3s;
+        }
+
+        .card:hover {
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .meme-title {
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .meme-image {
+            width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+            background: black;
+            border-radius: 8px;
+        }
+
+        .meme-meta {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.875rem;
+            margin-top: 0.75rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            color: white;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #a78bfa;
+        }
+
+        .preview {
+            margin-top: 1rem;
+        }
+
+        .preview-label {
+            color: white;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: white;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .page-title {
+            color: white;
+            font-size: 1.75rem;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <h1>🔥 MemeZone</h1>
+        <div class="nav-buttons">
+            <button class="btn active" id="feedBtn" onclick="showFeed()">
+                🏠 Feed
+            </button>
+            <button class="btn btn-secondary" id="postBtn" onclick="showPost()">
+                ➕ Post
+            </button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Feed View -->
+        <div id="feedView">
+            <div class="header-row">
+                <h2 class="page-title">Random Meme Feed</h2>
+                <button class="btn btn-gradient" onclick="shuffleMemes()">
+                    🔀 Shuffle
+                </button>
+            </div>
+            <div id="memeFeed"></div>
+        </div>
+
+        <!-- Post View -->
+        <div id="postView" class="hidden">
+            <div class="card">
+                <h2 class="page-title" style="margin-bottom: 1.5rem;">Post a Meme</h2>
+                
+                <div class="input-group">
+                    <label for="memeTitle">Meme Title</label>
+                    <input type="text" id="memeTitle" placeholder="Enter a catchy title...">
+                </div>
+
+                <div class="input-group">
+                    <label for="memeUrl">Image URL</label>
+                    <input type="url" id="memeUrl" placeholder="https://example.com/meme.jpg" oninput="updatePreview()">
+                    <p style="color: rgba(255,255,255,0.6); font-size: 0.875rem; margin-top: 0.5rem;">
+                        Paste a direct link to an image
+                    </p>
+                </div>
+
+                <div id="previewContainer" class="preview hidden">
+                    <p class="preview-label">Preview:</p>
+                    <img id="previewImage" class="meme-image" alt="Preview">
+                </div>
+
+                <button class="btn btn-gradient" style="width: 100%; margin-top: 1.5rem;" onclick="postMeme()">
+                    Post Meme 🚀
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        🔥 Memes are shared with all users 🔥
+    </div>
+
+    <script>
+        let memes = [];
+
+        // Load memes on page load
+        loadMemes();
+
+        async function loadMemes() {
+            try {
+                const response = await fetch('/api/memes');
+                memes = await response.json();
+                shuffleMemes();
+            } catch (err) {
+                console.error('Error loading memes:', err);
+                displayMemes();
+            }
+        }
+
+        function shuffleMemes() {
+            memes = memes.sort(() => Math.random() - 0.5);
+            displayMemes();
+        }
+
+        function displayMemes() {
+            const feed = document.getElementById('memeFeed');
+            
+            if (memes.length === 0) {
+                feed.innerHTML = `
+                    <div class="card empty-state">
+                        <div class="empty-state-icon">📤</div>
+                        <p style="font-size: 1.25rem;">No memes yet! Be the first to post.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            feed.innerHTML = memes.map(meme => `
+                <div class="card">
+                    <h3 class="meme-title">${escapeHtml(meme.title)}</h3>
+                    <img src="${escapeHtml(meme.imageUrl)}" 
+                         alt="${escapeHtml(meme.title)}" 
+                         class="meme-image"
+                         onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%23333%22 width=%22400%22 height=%22300%22/%3E%3Ctext fill=%22%23666%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 font-family=%22sans-serif%22%3EImage not found%3C/text%3E%3C/svg%3E'">
+                    <div class="meme-meta">Posted ${new Date(meme.timestamp).toLocaleString()}</div>
+                </div>
+            `).join('');
+        }
+
+        async function postMeme() {
+            const title = document.getElementById('memeTitle').value.trim();
+            const imageUrl = document.getElementById('memeUrl').value.trim();
+
+            if (!title || !imageUrl) {
+                alert('Please enter both title and image URL');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/memes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ title, imageUrl })
+                });
+
+                if (response.ok) {
+                    document.getElementById('memeTitle').value = '';
+                    document.getElementById('memeUrl').value = '';
+                    document.getElementById('previewContainer').classList.add('hidden');
+                    await loadMemes();
+                    showFeed();
+                } else {
+                    alert('Failed to post meme. Please try again.');
+                }
+            } catch (err) {
+                console.error('Error posting meme:', err);
+                alert('Failed to post meme. Please try again.');
+            }
+        }
+
+        function updatePreview() {
+            const url = document.getElementById('memeUrl').value.trim();
+            const preview = document.getElementById('previewContainer');
+            const img = document.getElementById('previewImage');
+
+            if (url) {
+                img.src = url;
+                preview.classList.remove('hidden');
+            } else {
+                preview.classList.add('hidden');
+            }
+        }
+
+        function showFeed() {
+            document.getElementById('feedView').classList.remove('hidden');
+            document.getElementById('postView').classList.add('hidden');
+            document.getElementById('feedBtn').classList.add('active');
+            document.getElementById('postBtn').classList.remove('active');
+        }
+
+        function showPost() {
+            document.getElementById('feedView').classList.add('hidden');
+            document.getElementById('postView').classList.remove('hidden');
+            document.getElementById('feedBtn').classList.remove('active');
+            document.getElementById('postBtn').classList.add('active');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
